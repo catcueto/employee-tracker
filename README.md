@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 12 SQL: Employee Tracker
 
 ## Your Task
@@ -180,3 +181,6 @@ You are required to submit BOTH of the following for review:
 
 - - -
 © 2022 Trilogy Education Services, LLC, a 2U, Inc. brand. Confidential and Proprietary. All Rights Reserved.
+=======
+
+>>>>>>> 342cf4c994f086b292b71c1037bf1bbf934ec6dc
