@@ -5,6 +5,7 @@ const inquirer = require("inquirer");
 // Prints pretty tables (array of objects) in console
 const consoleT = require("console.table");
 const util = require("util");
+const { constants } = require("fs");
 
 // Connecting to database & importing mysql library
 const db = mysql.createConnection(
@@ -65,7 +66,7 @@ const mainMenu = async () => {
         break;
 
       case "Add New Employee":
-        viewAddEmpl();
+        addNewEmpl();
         break;
 
       case "Update Employee Role":
@@ -152,6 +153,7 @@ const addNewDept = async () => {
       message: "What is the name of the department?",
       default: "New Department",
     });
+    console.log(answer);
     await db.query("INSERT INTO department SET ?", {
       names: answer.addDept,
     });
@@ -178,6 +180,7 @@ const addNewRole = async () => {
       type: "input",
       name: "roleSalaryNew",
       message: "What is the salary of the role?",
+      default: "90000",
     });
 
     // Overall department list
@@ -201,7 +204,55 @@ const addNewRole = async () => {
       department_id: roleDept.newRoleDept,
     });
 
-    console.log(`\n${roleName.newRoleName} added to Roles\n`);
+    console.log(`\n${roleName.roleNameNew} added to Roles\n`);
+    mainMenu();
+  } catch (err) {
+    console.log(err);
+    mainMenu();
+  }
+};
+
+//TODO: Add new employee
+const addNewEmpl = async () => {
+  try {
+    console.log("\n------------ Add Employee ------------\n");
+    // first name
+    let empFirstName = await inquirer.prompt({
+      type: "input",
+      name: "empFNameNeW",
+      message: "What is the employee's first name?",
+    });
+
+    // last name
+    let empLastName = await inquirer.prompt({
+      type: "input",
+      name: "empLNameNew",
+      message: "What is the employee's last name?",
+    });
+
+    // Employee's role
+    let roles = await db.query("SELECT * FROM employee");
+    let roleEmpl = await inquirer.prompt({
+      type: "list",
+      name: "newEmpRole",
+      message: "What role does your employee have?",
+      choices: roles.map((newEmpRole) => {
+        return {
+          name: newEmpRole.role_id,
+          value: newEmpRole.id,
+        };
+      }),
+    });
+
+    await db.query("INSERT INTO employee SET ?", {
+      first_name: empFirstName.empFNameNeW,
+      last_name: empLastName.empLNameNew,
+      role_id: roleEmpl.newEmpRole,
+    });
+
+    console.log(
+      `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees\n`
+    );
     mainMenu();
   } catch (err) {
     console.log(err);
