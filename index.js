@@ -69,8 +69,8 @@ const mainMenu = async () => {
         addNewEmpl();
         break;
 
-      case "Update Employee Role":
-        updateRole();
+      case "Update Employee Details":
+        updateEmpl();
         break;
     }
   } catch (err) {
@@ -251,7 +251,54 @@ const addNewEmpl = async () => {
     });
 
     console.log(
-      `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees\n`
+      `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees List\n`
+    );
+    mainMenu();
+  } catch (err) {
+    console.log(err);
+    mainMenu();
+  }
+};
+
+// TODO: Update employee
+const updateEmpl = async () => {
+  try {
+    console.log("\n------------ Update Employee ------------\n");
+    (prompt = "SELECT id, first_name, last_name FROM employee"),
+      db.query(prompt, function (err, res) {
+        if (err) throw err;
+      });
+    // we use map method to create new array so we don't alter preexisting data
+    let employeeList = results.map((employeeDetails) => {
+      return {
+        name: employeeDetails.first_name,
+        value: employeeDetails.id,
+      };
+    });
+    console.log(employeeList);
+
+    (prompt = "SELECT id, title FROM roles"),
+      db.query(prompt, function (err, res) {
+        if (err) throw err;
+      });
+
+    let roleList = role.map((roleInfo) => {
+      return {
+        name: roleInfo.title,
+        value: roleInfo.id,
+      };
+    });
+    console.log(roleList);
+
+    // Prompting user about what employee needs updates
+    await inquirer.prompt({
+      type: "list",
+      name: "updateEmployee",
+      message: "Which employee would you like to update?",
+      choices: employeeList,
+    });
+    console.log(
+      `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees List\n`
     );
     mainMenu();
   } catch (err) {
