@@ -40,7 +40,7 @@ const mainMenu = async () => {
         "Add New Department",
         "Add New Role",
         "Add New Employee",
-        "Update Employee Role",
+        "Update Employee Info",
       ],
     });
 
@@ -69,7 +69,7 @@ const mainMenu = async () => {
         addNewEmpl();
         break;
 
-      case "Update Employee Details":
+      case "Update Employee Info":
         updateEmpl();
         break;
     }
@@ -264,12 +264,10 @@ const addNewEmpl = async () => {
 const updateEmpl = async () => {
   try {
     console.log("\n------------ Update Employee ------------\n");
-    (prompt = "SELECT id, first_name, last_name FROM employee"),
-      db.query(prompt, function (err, res) {
-        if (err) throw err;
-      });
+    let employees = await db.query("SELECT * FROM employee");
+    console.log(employees);
     // we use map method to create new array so we don't alter preexisting data
-    let employeeList = results.map((employeeDetails) => {
+    let employeeList = employees.map((employeeDetails) => {
       return {
         name: employeeDetails.first_name,
         value: employeeDetails.id,
@@ -277,12 +275,9 @@ const updateEmpl = async () => {
     });
     console.log(employeeList);
 
-    (prompt = "SELECT id, title FROM roles"),
-      db.query(prompt, function (err, res) {
-        if (err) throw err;
-      });
+    let roles = await db.query("SELECT id, title FROM roles");
 
-    let roleList = role.map((roleInfo) => {
+    let roleList = roles.map((roleInfo) => {
       return {
         name: roleInfo.title,
         value: roleInfo.id,
