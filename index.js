@@ -1,11 +1,10 @@
+// Prints pretty tables (array of objects) in console
+const cTable = require("console.table");
 // Importing and requiring mysql2
 const mysql = require("mysql2");
 // Importing and requiring inquirer
 const inquirer = require("inquirer");
-// Prints pretty tables (array of objects) in console
-const consoleT = require("console.table");
 const util = require("util");
-const { constants } = require("fs");
 
 // Connecting to database & importing mysql library
 const db = mysql.createConnection(
@@ -15,7 +14,9 @@ const db = mysql.createConnection(
     password: "root1234",
     database: "staff_db",
   },
-  console.log(`Successfully connected to the staff_db database.`)
+  console.log(`Successfully connected to the staff_db database. \n\n  --------------------------
+  EMPLOYEE MANAGEMENT SYSTEM
+  -------------------------- \n`)
 );
 
 db.query = util.promisify(db.query);
@@ -292,9 +293,29 @@ const updateEmpl = async () => {
       message: "Which employee would you like to update?",
       choices: employeeList,
     });
-    console.log(
-      `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees List\n`
-    );
+    // console.log(
+    //   // `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees List\n`
+    // );
+
+    let updates = await db.query("SELECT * FROM employee");
+    let updatingRole = await inquirer.prompt({
+      type: "list",
+      name: "updateEmplRole",
+      message: "What employee's role do you want to update?",
+      choices: updates.map((updateEmplRole) => {
+        return {
+          name: updateEmplRole.role_id,
+          value: updateEmplRole.id,
+        };
+      }),
+    });
+
+    await db.query("INSERT INTO employee SET ?", {
+      first_name: empFirstName.empFNameNeW,
+      last_name: empLastName.empLNameNew,
+      role_id: updatingRole.updateEmplRole,
+    });
+
     mainMenu();
   } catch (err) {
     console.log(err);
