@@ -127,8 +127,8 @@ const viewAllRole = async () => {
 const viewAllEmpl = async () => {
   try {
     console.log("\n------------ All Employees ------------\n");
-    prompt = "SELECT * FROM employee";
-    db.query(prompt, function (err, res) {
+    employeeName = "SELECT * FROM employee";
+    db.query(employeeName, function (err, res) {
       if (err) throw err;
       let emplArray = [];
       // iterate thru employee array
@@ -148,18 +148,18 @@ const viewAllEmpl = async () => {
 const addNewDept = async () => {
   try {
     console.log("\n------------ All Department ------------\n");
-    let answer = await inquirer.prompt({
+    let department = await inquirer.prompt({
       type: "input",
       name: "addDept",
       message: "What is the name of the department?",
       default: "New Department",
     });
-    console.log(answer);
+    console.log(department);
     await db.query("INSERT INTO department SET ?", {
-      names: answer.addDept,
+      names: department.addDept,
     });
 
-    console.log(`\n${answer.addDept} added to department list\n`);
+    console.log(`\n${department.addDept} added to department list\n`);
     mainMenu();
   } catch (err) {
     console.log(err);
@@ -280,7 +280,7 @@ const updateEmpl = async () => {
 
     let roleList = roles.map((roleInfo) => {
       return {
-        name: roleInfo.title,
+        name: roleInfo.roles,
         value: roleInfo.id,
       };
     });
@@ -289,7 +289,7 @@ const updateEmpl = async () => {
     // Prompting user about what employee needs updates
     await inquirer.prompt({
       type: "list",
-      name: "updateEmployee",
+      name: "updateEmployeeName",
       message: "Which employee would you like to update?",
       choices: employeeList,
     });
@@ -304,11 +304,12 @@ const updateEmpl = async () => {
       message: "What employee's role do you want to update?",
       choices: updates.map((updateEmplRole) => {
         return {
-          name: updateEmplRole.role_id,
+          name: updateEmplRole.roles,
           value: updateEmplRole.id,
         };
       }),
     });
+    console.log(updatingRole);
 
     await db.query("INSERT INTO employee SET ?", {
       first_name: empFirstName.empFNameNeW,
