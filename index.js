@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 // Importing and requiring inquirer
 const inquirer = require("inquirer");
 const util = require("util");
+const { debug } = require("console");
 
 // Connecting to database & importing mysql library
 const db = mysql.createConnection(
@@ -262,64 +263,61 @@ const addNewEmpl = async () => {
 };
 
 // TODO: Update employee
-const updateEmpl = async () => {
-  try {
-    console.log("\n------------ Update Employee ------------\n");
-    let employees = await db.query("SELECT * FROM employee");
-    console.log(employees);
-    // we use map method to create new array so we don't alter preexisting data
-    let employeeList = employees.map((employeeDetails) => {
-      return {
-        name: employeeDetails.first_name,
-        value: employeeDetails.id,
-      };
-    });
-    console.log(employeeList);
-
-    let roles = await db.query("SELECT id, title FROM roles");
-
-    let roleList = roles.map((roleInfo) => {
-      return {
-        name: roleInfo.roles,
-        value: roleInfo.id,
-      };
-    });
-    console.log(roleList);
-
-    // Prompting user about what employee needs updates
-    await inquirer.prompt({
-      type: "list",
-      name: "updateEmployeeName",
-      message: "Which employee would you like to update?",
-      choices: employeeList,
-    });
-    // console.log(
-    //   // `\n${empFirstName.empFNameNeW} ${empLastName.empLNameNew} added to Employees List\n`
-    // );
-
-    let updates = await db.query("SELECT * FROM employee");
-    let updatingRole = await inquirer.prompt({
-      type: "list",
-      name: "updateEmplRole",
-      message: "What employee's role do you want to update?",
-      choices: updates.map((updateEmplRole) => {
+function updateEmpl() {
+  db.query(
+    "SELECT id, first_name, last_name FROM employee",
+    function (err, res) {
+      if (err) {
+        throw err;
+      }
+      let employeeList = res.map((employeeInfo) => {
         return {
-          name: updateEmplRole.roles,
-          value: updateEmplRole.id,
+          name: employeeInfo.first_name,
+          value: employeeInfo.id,
         };
-      }),
-    });
-    console.log(updatingRole);
+      });
+      console.log(employeeList);
 
-    await db.query("INSERT INTO employee SET ?", {
-      first_name: empFirstName.empFNameNeW,
-      last_name: empLastName.empLNameNew,
-      role_id: updatingRole.updateEmplRole,
-    });
+      db.query("SELECT id, title FROM roles", function (err, role) {
+        if (err) {
+          throw err;
+        }
+        let roleList = role.map((roleInfo) => {
+          return {
+            name: roleInfo.title,
+            value: roleInfo.id,
+          };
+        });
 
-    mainMenu();
-  } catch (err) {
-    console.log(err);
-    mainMenu();
-  }
-};
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "who",
+              message: "which employee would you like to update?",
+              choices: employeeList,
+            },
+            {
+              type: "list",
+              name: "role",
+              message: "What role would you like to give this employee?",
+              choices: roleList,
+            },
+          ])
+          .then((answers) => {
+            console.log(answers);
+            db.query(
+              `UPDATE employee SET role_id = ${answers.role} WHERE id = ${answers.who}`,
+              function (err, results) {
+                if (err) {
+                  throw err;
+                }
+                console.table("Successfully updated");
+                mainMenu();
+              }
+            );
+          });
+      });
+    }
+  );
+}
