@@ -4,15 +4,21 @@
 
 Used Node.js, Inquirer, and MySQL to create a content management system with the purpose of providing the necessary tools for non-developers to easily view and interact with information stored in databases. Users can view departments, employees, roles, and update employee's information. A walkthrough video can be found in the link below:
 
-[ADD VIDEO LINK]
+https://drive.google.com/file/d/1L76QoHAk-hSnJc2dgaL6FwHZlDc0HN6h/view
 
 ## Table of Contents
+
+- [App's Appearance](#appearance)
 
 - [Installation](#installation)
 
 - [Usage](#usage)
 
 - [Questions](#questions)
+
+## Appearance
+
+![alt text](./Assets/imgs/screenshot-tables.PNG)
 
 ## Installation
 
@@ -50,6 +56,4 @@ node index.js
 
 ## Questions
 
-If you have any questions about this repository, please contact me directly at catacueto@gmail.com
-
-You can find more of my work at https://github.com/catcueto
+If you have any questions about this repository, please contact me directly at catacueto@gmail.com. You can find more of my work at https://github.com/catcueto.

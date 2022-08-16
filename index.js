@@ -233,7 +233,7 @@ const addNewEmpl = async () => {
     });
 
     // Employee's role
-    let roles = await db.query("SELECT * FROM employee");
+    let roles = await db.query("SELECT * FROM roles");
     let roleEmpl = await inquirer.prompt({
       type: "list",
       name: "newEmpRole",
@@ -264,60 +264,53 @@ const addNewEmpl = async () => {
 
 // TODO: Update employee
 function updateEmpl() {
-  db.query(
-    "SELECT id, first_name, last_name FROM employee",
-    function (err, res) {
+  db.query("SELECT * FROM employee", function (err, res) {
+    if (err) {
+      throw err;
+    }
+    let employeeList = res.map((emplDeets) => {
+      return {
+        name: emplDeets.first_name,
+        value: emplDeets.id,
+      };
+    });
+    console.log(employeeList);
+
+    db.query("SELECT * FROM roles", function (err, res) {
       if (err) {
         throw err;
       }
-      let employeeList = res.map((employeeInfo) => {
+      let roleList = res.map((roleInfo) => {
         return {
-          name: employeeInfo.first_name,
-          value: employeeInfo.id,
+          name: roleInfo.title,
+          value: roleInfo.id,
         };
       });
-      console.log(employeeList);
 
-      db.query("SELECT id, title FROM roles", function (err, role) {
-        if (err) {
-          throw err;
-        }
-        let roleList = role.map((roleInfo) => {
-          return {
-            name: roleInfo.title,
-            value: roleInfo.id,
-          };
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "emplName",
+            message: "which employee would you like to update?",
+            // employeeList has employees' first names
+            choices: employeeList,
+          },
+          {
+            type: "list",
+            name: "role_id",
+            message: "What role would you like to give this employee?",
+            choices: roleList,
+          },
+        ])
+        .then((response) => {
+          db.query("UPDATE employee SET role_id = ? WHERE id = ?", [
+            response.role_id,
+            response.emplName,
+          ]);
+          console.table("Successfully updated employee's role");
+          mainMenu();
         });
-
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              name: "who",
-              message: "which employee would you like to update?",
-              choices: employeeList,
-            },
-            {
-              type: "list",
-              name: "role",
-              message: "What role would you like to give this employee?",
-              choices: roleList,
-            },
-          ])
-          .then((answers) => {
-            console.log(answers);
-            db.query(
-              `UPDATE employee SET role_id = ${answers.role} WHERE id = ${answers.who}`,
-              function (err, results) {
-                if (err) {
-                  throw err;
-                }
-                console.table("Successfully updated");
-                mainMenu();
-              }
-            );
-          });
-      });
-    }
-  );
+    });
+  });
 }
